@@ -1,3 +1,4 @@
+import java.util.ListIterator;
 import java.util.NoSuchElementException;
 
 public class DoubleLinkedList<T> {
@@ -147,7 +148,7 @@ public class DoubleLinkedList<T> {
         return sb.toString();
     }
 
-    public class MyListIterator{
+    public class MyListIterator implements ListIterator<T> {
 
         private int position;
         private Node<T> selected;
@@ -161,6 +162,7 @@ public class DoubleLinkedList<T> {
             position = -1;
         }
 
+        @Override
         public void add(T object){
             if (position == -1 || previous == null){
                 addFirst(object);
@@ -181,14 +183,17 @@ public class DoubleLinkedList<T> {
             position++;
         }
 
+        @Override
         public boolean hasNext(){
             return following != null;
         }
 
+        @Override
         public boolean	hasPrevious(){
             return previous != null ;
         }
 
+        @Override
         public T next(){
             if (!hasNext()) throw new NoSuchElementException();
             selected = following;
@@ -198,10 +203,12 @@ public class DoubleLinkedList<T> {
             return selected.object;
         }
 
+        @Override
         public int	nextIndex(){
             return position + 1;
         }
 
+        @Override
         public T previous(){
             if (!hasPrevious()) throw new NoSuchElementException();
             selected = previous;
@@ -211,11 +218,13 @@ public class DoubleLinkedList<T> {
             return selected.object;
         }
 
+        @Override
         public int	previousIndex(){
             if (hasPrevious()) return position - 1;
             return -1;
         }
 
+        @Override
         public void	remove(){
             if (selected == null) throw new IllegalStateException();
             removeNode(selected);
@@ -223,6 +232,7 @@ public class DoubleLinkedList<T> {
             position--;
         }
 
+        @Override
         public void	set(T object){
             if (selected == null) throw new IllegalStateException();
             Node<T> node = new Node<>(object);
