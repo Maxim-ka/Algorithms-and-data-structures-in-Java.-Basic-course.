@@ -18,6 +18,11 @@ public class Thing {
         jewel = new Random().nextInt(100);
     }
 
+    public Thing(int weight, int jewel) {
+        this.weight = weight;
+        this.jewel = jewel;
+    }
+
     @Override
     public String toString() {
         return String.format("weight- %d, jewel- %d;", weight, jewel);
