@@ -4,52 +4,46 @@ public class Backpack {
 
     private int carryingCapacity;
     private ArrayList<Thing> backpack;
-    private int currentWeightOfBackpack;
     private int costOfBackpack;
+    private int costOfSet;
+    private int weightSet;
 
     public Backpack(int carryingCapacity) {
         this.carryingCapacity = carryingCapacity;
         backpack = new ArrayList<>();
-        currentWeightOfBackpack = 0;
         costOfBackpack = 0;
     }
 
-    public ArrayList<Thing> toTake(int number,Thing ... things){
+    public ArrayList<Thing> toTake(int number, Thing ... things){
         if (number == things.length) return backpack;
         if (things[number].getWeight() <= carryingCapacity){
-            if (things[number].getWeight() + currentWeightOfBackpack <= carryingCapacity) {
-                backpack.add(things[number]);
-                currentWeightOfBackpack += things[number].getWeight();
-                costOfBackpack += things[number].getJewel();
-            }else{
-                if (!compare(0, things[number]) && costOfBackpack < things[number].getJewel()){
-                    for (int i = 0; i < backpack.size(); i++) {
-                        currentWeightOfBackpack -= backpack.get(i).getWeight();
-                        costOfBackpack -= backpack.get(i).getJewel();
-                    }
-                    backpack.clear();
-                    backpack.add(things[number]);
-                    currentWeightOfBackpack += things[number].getWeight();
-                    costOfBackpack += things[number].getJewel();
-                }
-            }
+            selectSet(number - 1, things[number], things);
         }
         return toTake(number + 1, things);
     }
 
-    private boolean compare(int index, Thing thing){
-        if (index == backpack.size()) return false;
-//        if (thing.getJewel() > backpack.get(index).getJewel()){
-            if (costOfBackpack  < thing.getJewel() + (costOfBackpack - backpack.get(index).getJewel()) &&
-                thing.getWeight() + (currentWeightOfBackpack - backpack.get(index).getWeight()) <= carryingCapacity){
-                currentWeightOfBackpack += (thing.getWeight() - backpack.get(index).getWeight());
-                costOfBackpack += (thing.getJewel() - backpack.get(index).getJewel());
-                backpack.remove(backpack.get(index));
-                backpack.add(thing);
-                return true;
-            }
-//        }
-        return compare(index + 1, thing);
+    private void selectSet(int index, Thing thing, Thing[] things){
+        if (index == -1) return;
+        ArrayList<Thing> set = new ArrayList<>();
+        weightSet = thing.getWeight();
+        costOfSet = thing.getJewel();
+        set.add(thing);
+        set = collectSet(index, set, things);
+        if (costOfSet > costOfBackpack){
+            costOfBackpack = costOfSet;
+            backpack = set;
+        }
+        selectSet(index - 1, thing, things);
+    }
+
+    private ArrayList<Thing> collectSet(int index, ArrayList<Thing> arrayList, Thing[] things){
+        if (index == -1) return arrayList;
+        if (things[index].getWeight() + weightSet <= carryingCapacity){
+            weightSet += things[index].getWeight();
+            costOfSet += things[index].getJewel();
+            arrayList.add(things[index]);
+        }
+        return collectSet(index - 1, arrayList, things);
     }
 
     public int[] getCostOfBackpack(){
@@ -58,19 +52,6 @@ public class Backpack {
             cost[i] = backpack.get(i).getJewel();
         }
         return cost;
-    }
-
-    private Thing findNotNeeded(int index, Thing thing){
-        if (index == backpack.size()) return findCheapThing(0, backpack.get(0));
-        if (backpack.get(index).getWeight() + thing.getWeight() > carryingCapacity) return backpack.get(index);
-        return findNotNeeded(index + 1, thing);
-    }
-
-    private Thing findCheapThing(int index, Thing thing){
-        Thing cheap  = thing;
-        if (index == backpack.size()) return cheap;
-        if (cheap.getJewel() > backpack.get(index).getJewel()) cheap = backpack.get(index);
-        return findCheapThing(index + 1, cheap);
     }
 
     @Override
